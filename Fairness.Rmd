@@ -270,7 +270,7 @@ Researchers wants to know who makes more money.
 So they fit a logistic regression.
 
 ```{r}
-adult_glm_model <- glm(target~ age+workclass+education_num+marital_status+occupation+relationship+race+sex, 
+adult_glm_model <- glm(target~ age+workclass+education_num+marital_status+occupation+relationship+race, 
   data=adult_train,family=binomial(link="logit"))
 summary(adult)
 ```
@@ -296,6 +296,7 @@ The conclusion is the current model we fail to catch some significant trends.
 
 Is there a problem?
 There might be exist a social bias considering male as a privileged group. We need to consider the indepence metric and improve reduce the effect of privileged group before modeling.
+However, we can't fully remove the social bias since some actions needs to be appled in the collecting step.
 
 
 
@@ -365,7 +366,7 @@ Do you see any problem with this model with protected attributes such as race an
 Choose one of the data described above as your target problem.
 
 ```         
-Please write your answer in full sentences.
+Diabetes dataset
 
 ```
 
@@ -373,36 +374,54 @@ Discuss what a favorable label in this problem is and what does a favorable labe
 Is it assertive or non-punitive?
 
 ```         
-Please write your answer in full sentences.
+A favorable label in this problem is 0 in readmit_30_days
+it is assertive
 
 ```
 
 What type of justice is this issue about?
 
 ```         
-Please write your answer in full sentences.
+It's about distributive justice.
 
 ```
 
 Discuss the potential concerns about the data being used.
 
 ```         
-Please write your answer in full sentences.
+We need to consider more about bias and data privacy
 
 ```
 
 Discuss what type of group fairness metrics is appropriate for this problem.
 
 ```         
-Please write your answer in full sentences.
+Statistical parity difference
 
 ```
 
 Using the appropriate fairness metrics, show if there are concerns in the prediction algorithm.
 
 ```{r}
-#
-#
+data = diabetic
+prediction<- predict(diabetes_glm_model, newdata = diabetic, type = "response")
+
+
+prob_privileged <- data %>%
+  filter(readmit_30_days == 1) %>%
+  summarise(prob = mean(prediction)) %>%
+  .$prob
+
+
+prob_unprivileged <- data %>%
+  filter(readmit_30_days == 0) %>%
+  summarise(prob = mean(prediction)) %>%
+  .$prob
+
+stat_parity_difference <- prob_privileged - prob_unprivileged
+
+
+print(paste("Statistical Parity Difference: ", stat_parity_difference))
 ```
 
 ```         
@@ -418,7 +437,7 @@ Given that you have access to the original data, but not to the model used to ma
 ```
 
 ```         
-Please write your answer in full sentences.
+To ensure fairness in machine learning, we can balance our data, adjust measurements, remove biased information, and analyze for unintended impacts. We also use algorithms designed for fairness, apply techniques to prevent reliance on biased data, tweak our success criteria, conduct regular checks for bias, and involve humans to guide decisions and maintain fairness.
 
 ```
 
